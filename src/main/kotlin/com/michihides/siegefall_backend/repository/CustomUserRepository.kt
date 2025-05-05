@@ -9,4 +9,6 @@ import java.util.Optional
 interface CustomUserRepository: JpaRepository<CustomUser, Long> {
     // Custom Query
     fun findByUsername(username: String): Optional<CustomUser>
+
+    fun findByEmail(email: String): Optional<CustomUser>
 }

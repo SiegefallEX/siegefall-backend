@@ -1,5 +1,7 @@
 package com.michihides.siegefall_backend.controller
 
+import com.michihides.siegefall_backend.dto.CustomAuthResponse
+import com.michihides.siegefall_backend.dto.CustomLoginRequest
 import com.michihides.siegefall_backend.model.CustomUser
 import com.michihides.siegefall_backend.repository.CustomUserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,16 +43,42 @@ class UserController(
         return ResponseEntity.notFound().build()
     }
 
-    @PostMapping
+    @PostMapping("/register")
     fun createUser(
         @Validated @RequestBody newUser: CustomUser
     ): ResponseEntity<String> {
         val bcryptUser = CustomUser(
-            newUser.email, newUser.username, passwordEncoder.encode(newUser.password)
+            newUser.email,
+            newUser.username,
+            passwordEncoder.encode(newUser.password),
+            newUser.stamina,
+            newUser.diamonds,
+            newUser.gold,
+            newUser.characters,
+            newUser.defense,
+            newUser.rankingNormalPvp,
+            newUser.rankingColloseum
         )
 
         customUserRepository.save(bcryptUser)
 
         return ResponseEntity.status(201).body("User was successfully created!")
+    }
+
+    @PostMapping("/login")
+    fun loginUser(@RequestBody loginRequest: CustomLoginRequest.LoginRequest): ResponseEntity<CustomAuthResponse.AuthResponse> {
+        val foundUserOptional = customUserRepository.findByEmail(loginRequest.email)
+
+        if (foundUserOptional.isEmpty) {
+            return ResponseEntity.status(404).body(CustomAuthResponse.AuthResponse(false, "User not found", "", ""))
+        }
+
+        val foundUser = foundUserOptional.get()
+
+        if (!passwordEncoder.matches(loginRequest.password, foundUser.password)) {
+            return ResponseEntity.status(401).body(CustomAuthResponse.AuthResponse(false, "Invalid email or password", "", ""))
+        }
+
+        return ResponseEntity.ok(CustomAuthResponse.AuthResponse(true, "Login successful!", "Placeholder Token, TODO - IMPLEMENT", foundUser.username))
     }
 }
