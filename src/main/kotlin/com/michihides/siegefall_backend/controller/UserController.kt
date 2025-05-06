@@ -46,7 +46,7 @@ class UserController(
     @PostMapping("/register")
     fun createUser(
         @Validated @RequestBody newUser: CustomUser
-    ): ResponseEntity<String> {
+    ): ResponseEntity<CustomAuthResponse.AuthResponse> {
         val bcryptUser = CustomUser(
             newUser.email,
             newUser.username,
@@ -62,7 +62,7 @@ class UserController(
 
         customUserRepository.save(bcryptUser)
 
-        return ResponseEntity.status(201).body("User was successfully created!")
+        return ResponseEntity.ok(CustomAuthResponse.AuthResponse(true, "Register successful!", "Placeholder Token, TODO - IMPLEMENT", newUser.username))
     }
 
     @PostMapping("/login")
