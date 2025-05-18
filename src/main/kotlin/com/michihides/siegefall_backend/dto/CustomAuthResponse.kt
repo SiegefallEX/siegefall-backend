@@ -7,4 +7,9 @@ class CustomAuthResponse {
         val token: String?,
         val username: String
     )
+
+    data class CharacterUpdateResponse(
+        val success: Boolean,
+        val message: String
+    )
 }

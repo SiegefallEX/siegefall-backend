@@ -13,8 +13,8 @@ class CustomUser(
     val stamina: Int,
     val diamonds: Int,
     val gold: Int,
-    val characters: Array<Int>,
-    val defense: Array<Int>,
+    val characters: List<Int>,
+    val defense: List<Int>,
     val rankingNormalPvp: Int,
     val rankingColloseum: Int,
 

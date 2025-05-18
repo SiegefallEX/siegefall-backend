@@ -1,7 +1,7 @@
 package com.michihides.siegefall_backend.controller
 
 import com.michihides.siegefall_backend.dto.CustomAuthResponse
-import com.michihides.siegefall_backend.dto.CustomLoginRequest
+import com.michihides.siegefall_backend.dto.CustomRequests
 import com.michihides.siegefall_backend.model.CustomUser
 import com.michihides.siegefall_backend.repository.CustomUserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,8 +11,10 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -66,7 +68,7 @@ class UserController(
     }
 
     @PostMapping("/login")
-    fun loginUser(@RequestBody loginRequest: CustomLoginRequest.LoginRequest): ResponseEntity<CustomAuthResponse.AuthResponse> {
+    fun loginUser(@RequestBody loginRequest: CustomRequests.LoginRequest): ResponseEntity<CustomAuthResponse.AuthResponse> {
         val foundUserOptional = customUserRepository.findByEmail(loginRequest.email)
 
         if (foundUserOptional.isEmpty) {
@@ -80,5 +82,39 @@ class UserController(
         }
 
         return ResponseEntity.ok(CustomAuthResponse.AuthResponse(true, "Login successful!", "Placeholder Token, TODO - IMPLEMENT", foundUser.username))
+    }
+
+    @PutMapping("/update-characters")
+    fun updateCharacters(
+        @RequestParam("id") id: Long,
+        @RequestBody request: CustomRequests.UpdateCharactersRequest
+    ): ResponseEntity<CustomAuthResponse.CharacterUpdateResponse> {
+        println("Received characters: ${request.characters}")
+
+        val foundUserOptional = customUserRepository.findById(id)
+
+        if (foundUserOptional.isEmpty) {
+            return ResponseEntity.status(404).body(CustomAuthResponse.CharacterUpdateResponse(false, "User not found"))
+        }
+
+        val foundUser = foundUserOptional.get()
+
+        val updatedUser = CustomUser(
+            email = foundUser.email,
+            username = foundUser.username,
+            password = foundUser.password,
+            stamina = foundUser.stamina,
+            diamonds = foundUser.diamonds,
+            gold = foundUser.gold,
+            characters = request.characters,
+            defense = foundUser.defense,
+            rankingNormalPvp = foundUser.rankingNormalPvp,
+            rankingColloseum = foundUser.rankingColloseum,
+            id = foundUser.id
+        )
+
+        customUserRepository.save(updatedUser)
+
+        return ResponseEntity.ok(CustomAuthResponse.CharacterUpdateResponse(success = true, message = "Characters successfully added!"))
     }
 }
