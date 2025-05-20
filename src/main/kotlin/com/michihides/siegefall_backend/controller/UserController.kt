@@ -5,6 +5,7 @@ import com.michihides.siegefall_backend.dto.CustomRequests
 import com.michihides.siegefall_backend.model.CustomUser
 import com.michihides.siegefall_backend.repository.CustomUserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.geo.CustomMetric
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -47,6 +48,17 @@ class UserController(
 
         return ResponseEntity.notFound().build()
     }
+
+    @PostMapping("/random-enemy")
+    fun getRandomUser(@RequestBody request: CustomRequests.GetRandomPlayer): ResponseEntity<CustomAuthResponse.RandomPlayerResponse> {
+        val result: List<CustomUser> = customUserRepository.findAll()
+        val resultNotPlayerOrEmptyDefense = result.filter { it.id != request.user.id && it.defense.isNotEmpty() }
+
+        val randomUser = resultNotPlayerOrEmptyDefense.randomOrNull()
+
+        return ResponseEntity.ok(CustomAuthResponse.RandomPlayerResponse(success = randomUser != null, user = randomUser ?: request.user, message = if (randomUser != null) "Random Enemy Successfully found!" else "No valid enemy available"))
+    }
+
 
     @PostMapping("/register")
     fun createUser(

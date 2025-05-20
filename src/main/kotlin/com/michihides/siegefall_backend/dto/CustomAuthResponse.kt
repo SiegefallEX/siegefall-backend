@@ -1,5 +1,7 @@
 package com.michihides.siegefall_backend.dto
 
+import com.michihides.siegefall_backend.model.CustomUser
+
 class CustomAuthResponse {
     data class AuthResponse(
         val success: Boolean,
@@ -10,6 +12,12 @@ class CustomAuthResponse {
 
     data class GeneralUpdateResponse(
         val success: Boolean,
+        val message: String
+    )
+
+    data class RandomPlayerResponse(
+        val success: Boolean,
+        val user: CustomUser,
         val message: String
     )
 }
