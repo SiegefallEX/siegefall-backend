@@ -92,7 +92,7 @@ class UserController(
         @RequestParam("id") id: Long,
         @RequestBody request: CustomRequests.UpdateCharactersRequest
     ): ResponseEntity<CustomAuthResponse.GeneralUpdateResponse> {
-        println("Receivued characters: ${request.characters}")
+        println("Recieved characters: ${request.characters}")
 
         val foundUserOptional = customUserRepository.findById(id)
 
@@ -102,20 +102,7 @@ class UserController(
 
         val foundUser = foundUserOptional.get()
 
-        val updatedUser = CustomUser(
-            email = foundUser.email,
-            username = foundUser.username,
-            password = foundUser.password,
-            stamina = foundUser.stamina,
-            diamonds = foundUser.diamonds,
-            gold = foundUser.gold,
-            characters = request.characters,
-            defense = foundUser.defense,
-            rankingNormalPvp = foundUser.rankingNormalPvp,
-            rankingColloseum = foundUser.rankingColloseum,
-            id = foundUser.id
-        )
-
+        val updatedUser = foundUser.copy(characters = request.characters)
         customUserRepository.save(updatedUser)
 
         return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Characters successfully added!"))
