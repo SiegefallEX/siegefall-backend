@@ -74,7 +74,11 @@ class UserController(
             newUser.characters,
             newUser.defense,
             newUser.rankingNormalPvp,
-            newUser.rankingColloseum
+            newUser.rankingColloseum,
+            newUser.pvmWins,
+            newUser.pvmLosses,
+            newUser.pvpWins,
+            newUser.pvpLosses
         )
 
         customUserRepository.save(bcryptUser)

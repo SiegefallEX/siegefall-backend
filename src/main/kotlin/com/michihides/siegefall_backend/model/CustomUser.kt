@@ -17,6 +17,10 @@ data class CustomUser(
     val defense: List<Int>,
     val rankingNormalPvp: Int,
     val rankingColloseum: Int,
+    val pvmWins: Int,
+    val pvmLosses: Int,
+    val pvpWins: Int,
+    val pvpLosses: Int,
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
