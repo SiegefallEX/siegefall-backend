@@ -9,4 +9,8 @@ class CustomRequests {
     data class UpdateCharactersRequest(
         val characters: List<Int>
     )
+
+    data class UpdateDefenseRequest(
+        val defense: List<Int>
+    )
 }

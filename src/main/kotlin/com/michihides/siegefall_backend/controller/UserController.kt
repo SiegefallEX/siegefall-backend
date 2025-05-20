@@ -88,13 +88,13 @@ class UserController(
     fun updateCharacters(
         @RequestParam("id") id: Long,
         @RequestBody request: CustomRequests.UpdateCharactersRequest
-    ): ResponseEntity<CustomAuthResponse.CharacterUpdateResponse> {
+    ): ResponseEntity<CustomAuthResponse.GeneralUpdateResponse> {
         println("Received characters: ${request.characters}")
 
         val foundUserOptional = customUserRepository.findById(id)
 
         if (foundUserOptional.isEmpty) {
-            return ResponseEntity.status(404).body(CustomAuthResponse.CharacterUpdateResponse(false, "User not found"))
+            return ResponseEntity.status(404).body(CustomAuthResponse.GeneralUpdateResponse(false, "User not found"))
         }
 
         val foundUser = foundUserOptional.get()
@@ -115,6 +115,40 @@ class UserController(
 
         customUserRepository.save(updatedUser)
 
-        return ResponseEntity.ok(CustomAuthResponse.CharacterUpdateResponse(success = true, message = "Characters successfully added!"))
+        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Characters successfully added!"))
+    }
+
+    @PutMapping("/update-defense")
+    fun updateDefense(
+        @RequestParam("id") id: Long,
+        @RequestBody request: CustomRequests.UpdateDefenseRequest
+    ): ResponseEntity<CustomAuthResponse.GeneralUpdateResponse> {
+        println("Defense Updated with: ${request.defense}")
+
+        val foundUserOptional = customUserRepository.findById(id)
+
+        if (foundUserOptional.isEmpty) {
+            return ResponseEntity.status(404).body(CustomAuthResponse.GeneralUpdateResponse(false, "User not found"))
+        }
+
+        val foundUser = foundUserOptional.get()
+
+        val updatedUser = CustomUser(
+            email = foundUser.email,
+            username = foundUser.username,
+            password = foundUser.password,
+            stamina = foundUser.stamina,
+            diamonds = foundUser.diamonds,
+            gold = foundUser.gold,
+            characters = foundUser.characters,
+            defense = request.defense,
+            rankingNormalPvp = foundUser.rankingNormalPvp,
+            rankingColloseum = foundUser.rankingColloseum,
+            id = foundUser.id
+        )
+
+        customUserRepository.save(updatedUser)
+
+        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Defense successfully updated!"))
     }
 }

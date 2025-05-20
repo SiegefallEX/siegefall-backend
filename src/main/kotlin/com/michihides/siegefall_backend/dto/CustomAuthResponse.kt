@@ -8,7 +8,7 @@ class CustomAuthResponse {
         val username: String
     )
 
-    data class CharacterUpdateResponse(
+    data class GeneralUpdateResponse(
         val success: Boolean,
         val message: String
     )
