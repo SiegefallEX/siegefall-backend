@@ -6,7 +6,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 
 @Entity
-class CustomUser(
+data class CustomUser(
     val email: String,
     val username: String,
     val password: String,
