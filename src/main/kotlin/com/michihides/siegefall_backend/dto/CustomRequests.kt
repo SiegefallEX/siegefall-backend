@@ -16,6 +16,10 @@ class CustomRequests {
         val defense: List<Int>
     )
 
+    data class GetModePlayedAndOutcome(
+        val caseGame: Int
+    )
+
     data class GetRandomPlayer(
         val user: CustomUser
     )

@@ -145,6 +145,32 @@ class UserController(
         return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Defense successfully updated!"))
     }
 
+    @PutMapping("/update-end-of-game")
+    fun updateEndOfGame(
+        @RequestParam("id") id: Long,
+        @RequestBody request: CustomRequests.GetModePlayedAndOutcome
+    ): ResponseEntity<CustomAuthResponse.GeneralUpdateResponse> {
+        val foundUserOptional = customUserRepository.findById(id)
+
+        if (foundUserOptional.isEmpty) {
+            return ResponseEntity.status(404).body(CustomAuthResponse.GeneralUpdateResponse(false, "User not found"))
+        }
+
+        val foundUser = foundUserOptional.get()
+
+        val updatedUser: CustomUser = when (request.caseGame) {
+            1 -> foundUser.copy(pvmWins = foundUser.pvmWins + 1)
+            2 -> foundUser.copy(pvmLosses = foundUser.pvmLosses + 1)
+            3 -> foundUser.copy(pvpWins = foundUser.pvpWins + 1)
+            4 -> foundUser.copy(pvpLosses = foundUser.pvpLosses + 1)
+            else -> foundUser
+        }
+
+        customUserRepository.save(updatedUser)
+
+        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "End of game stats updated without problem!"))
+    }
+
 
     @Scheduled(fixedRate = 360_000)
     fun staminaRefill() {
