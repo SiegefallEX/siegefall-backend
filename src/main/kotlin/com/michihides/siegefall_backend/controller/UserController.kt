@@ -136,20 +136,7 @@ class UserController(
 
         val foundUser = foundUserOptional.get()
 
-        val updatedUser = CustomUser(
-            email = foundUser.email,
-            username = foundUser.username,
-            password = foundUser.password,
-            stamina = foundUser.stamina,
-            diamonds = foundUser.diamonds,
-            gold = foundUser.gold,
-            characters = foundUser.characters,
-            defense = request.defense,
-            rankingNormalPvp = foundUser.rankingNormalPvp,
-            rankingColloseum = foundUser.rankingColloseum,
-            id = foundUser.id
-        )
-
+        val updatedUser = foundUser.copy(defense = request.defense)
         customUserRepository.save(updatedUser)
 
         return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Defense successfully updated!"))
