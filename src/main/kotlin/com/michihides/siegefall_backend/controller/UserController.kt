@@ -108,21 +108,51 @@ class UserController(
         @RequestParam("id") id: Long,
         @RequestBody request: CustomRequests.UpdateCharactersRequest
     ): ResponseEntity<CustomAuthResponse.GeneralUpdateResponse> {
-        println("Recieved characters: ${request.characters}")
-
         val foundUserOptional = customUserRepository.findById(id)
 
         if (foundUserOptional.isEmpty) {
-            return ResponseEntity.status(404).body(CustomAuthResponse.GeneralUpdateResponse(false, "User not found"))
+            return ResponseEntity.status(404)
+                .body(CustomAuthResponse.GeneralUpdateResponse(false, "User not found"))
         }
 
         val foundUser = foundUserOptional.get()
+        val foundUserCurrentCharacters = foundUser.characters.toMutableList()
 
-        val updatedUser = foundUser.copy(characters = request.characters)
+        // Checks if incoming characters matches a character name that has already been obtained
+        request.characters.forEach { character ->
+            val index = foundUserCurrentCharacters.indexOfFirst { it.name == character.name }
+            if (index >= 0) {
+                val dupeCharacterFound = foundUserCurrentCharacters[index]
+                val leveledUpCharacter = customCharacterLevelUp(dupeCharacterFound)
+                foundUserCurrentCharacters[index] = leveledUpCharacter
+            } else {
+                foundUserCurrentCharacters.add(character)
+            }
+        }
+
+        val updatedUser = foundUser.copy(characters = foundUserCurrentCharacters)
         customUserRepository.save(updatedUser)
 
-        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Characters successfully added!"))
+        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Characters successfully updated!"))
     }
+
+    // Level up function that gets called if a character is rolled and already exists in the characters array
+    fun customCharacterLevelUp(character: CustomCharacter): CustomCharacter {
+        val preLevelStats = character.stats
+        val afterLevelStats = CustomCharacter.Stats(
+            attack = preLevelStats.attack + (preLevelStats.attack / 5),
+            defense = preLevelStats.defense + (preLevelStats.defense / 5),
+            maxHp = preLevelStats.maxHp + (preLevelStats.maxHp / 5),
+            currentHp = preLevelStats.maxHp + (preLevelStats.maxHp / 5),
+            speed = preLevelStats.speed + (preLevelStats.speed / 5),
+            classType = preLevelStats.classType,
+            attackType = preLevelStats.attackType,
+            level = preLevelStats.level + 1
+        )
+
+        return character.copy(stats = afterLevelStats)
+    }
+
 
     @PutMapping("/update-defense")
     fun updateDefense(
@@ -139,15 +169,15 @@ class UserController(
 
         val foundUser = foundUserOptional.get()
 
-        val mergingDefenseArrays: List<CustomCharacter?> = request.defense.map { incoming ->
-            if (incoming == null) {
+        val mergingDefenseArrays: List<CustomCharacter?> = request.defense.map { character ->
+            if (character == null) {
                 null
             } else {
-                val persisted = foundUser.characters.find { it.name == incoming.name }
+                val persisted = foundUser.characters.find { it.name == character.name }
                 if (persisted != null) {
-                    incoming.copy(id = persisted.id)
+                    character.copy(id = persisted.id)
                 } else {
-                    incoming
+                    character
                 }
             }
         }
