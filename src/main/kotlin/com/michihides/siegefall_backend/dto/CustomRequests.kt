@@ -1,5 +1,6 @@
 package com.michihides.siegefall_backend.dto
 
+import com.michihides.siegefall_backend.model.CustomCharacter
 import com.michihides.siegefall_backend.model.CustomUser
 
 class CustomRequests {
@@ -9,11 +10,11 @@ class CustomRequests {
     )
 
     data class UpdateCharactersRequest(
-        val characters: List<Int>
+        val characters: MutableList<CustomCharacter>
     )
 
     data class UpdateDefenseRequest(
-        val defense: List<Int>
+        val defense: MutableList<CustomCharacter?>
     )
 
     data class GetModePlayedAndOutcome(
