@@ -2,10 +2,10 @@ package com.michihides.siegefall_backend.controller
 
 import com.michihides.siegefall_backend.dto.CustomAuthResponse
 import com.michihides.siegefall_backend.dto.CustomRequests
+import com.michihides.siegefall_backend.model.CustomCharacter
 import com.michihides.siegefall_backend.model.CustomUser
 import com.michihides.siegefall_backend.repository.CustomUserRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.geo.CustomMetric
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -139,7 +139,20 @@ class UserController(
 
         val foundUser = foundUserOptional.get()
 
-        val updatedUser = foundUser.copy(defense = request.defense)
+        val mergingDefenseArrays: List<CustomCharacter?> = request.defense.map { incoming ->
+            if (incoming == null) {
+                null
+            } else {
+                val persisted = foundUser.characters.find { it.name == incoming.name }
+                if (persisted != null) {
+                    incoming.copy(id = persisted.id)
+                } else {
+                    incoming
+                }
+            }
+        }
+
+        val updatedUser = foundUser.copy(defense = mergingDefenseArrays)
         customUserRepository.save(updatedUser)
 
         return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Defense successfully updated!"))
