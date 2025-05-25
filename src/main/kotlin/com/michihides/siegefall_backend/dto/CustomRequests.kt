@@ -21,6 +21,10 @@ class CustomRequests {
         val diamonds: Int
     )
 
+    data class UpdateStaminaRequest(
+        val stamina: Int
+    )
+
     data class GetModePlayedAndOutcome(
         val caseGame: Int
     )
