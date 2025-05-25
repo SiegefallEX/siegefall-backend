@@ -116,21 +116,33 @@ class UserController(
         }
 
         val foundUser = foundUserOptional.get()
-        val foundUserCurrentCharacters = foundUser.characters.toMutableList()
+        val foundUserCurrentCharactersToUpdate = foundUser.characters.toMutableList()
 
         // Checks if incoming characters matches a character name that has already been obtained
         request.characters.forEach { character ->
-            val index = foundUserCurrentCharacters.indexOfFirst { it.name == character.name }
+            val index = foundUserCurrentCharactersToUpdate.indexOfFirst { it.name == character.name }
             if (index >= 0) {
-                val dupeCharacterFound = foundUserCurrentCharacters[index]
+                val dupeCharacterFound = foundUserCurrentCharactersToUpdate[index]
                 val leveledUpCharacter = customCharacterLevelUp(dupeCharacterFound)
-                foundUserCurrentCharacters[index] = leveledUpCharacter
+                foundUserCurrentCharactersToUpdate[index] = leveledUpCharacter
             } else {
-                foundUserCurrentCharacters.add(character)
+                foundUserCurrentCharactersToUpdate.add(character)
             }
         }
 
-        val updatedUser = foundUser.copy(characters = foundUserCurrentCharacters)
+        // To check if defense has the character as well to update it accordingly
+        val foundUserCurrentDefenseToUpdate = foundUser.defense.toMutableList()
+        for (i in foundUserCurrentDefenseToUpdate.indices) {
+            val character = foundUserCurrentDefenseToUpdate[i]
+            if (character != null) {
+                val characterUpdated = foundUserCurrentCharactersToUpdate.firstOrNull { it.name == character.name }
+                if (characterUpdated != null) {
+                    foundUserCurrentDefenseToUpdate[i] = characterUpdated
+                }
+            }
+        }
+
+        val updatedUser = foundUser.copy(characters = foundUserCurrentCharactersToUpdate, defense = foundUserCurrentDefenseToUpdate)
         customUserRepository.save(updatedUser)
 
         return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Characters successfully updated!"))
@@ -212,6 +224,26 @@ class UserController(
         customUserRepository.save(updatedUser)
 
         return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "End of game stats updated without problem!"))
+    }
+
+    @PutMapping("/update-diamonds")
+    fun updateDiamonds(
+        @RequestParam("id") id: Long,
+        @RequestBody request: CustomRequests.UpdateDiamondsRequest
+    ): ResponseEntity<CustomAuthResponse.GeneralUpdateResponse> {
+        val foundUserOptional = customUserRepository.findById(id)
+
+        if (foundUserOptional.isEmpty) {
+            return ResponseEntity.status(404).body(CustomAuthResponse.GeneralUpdateResponse(false, "User not found"))
+        }
+
+        val foundUser = foundUserOptional.get()
+
+        val updatedUser: CustomUser = foundUser.copy(diamonds = foundUser.diamonds + request.diamonds)
+
+        customUserRepository.save(updatedUser)
+
+        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Diamonds have been updated!"))
     }
 
 

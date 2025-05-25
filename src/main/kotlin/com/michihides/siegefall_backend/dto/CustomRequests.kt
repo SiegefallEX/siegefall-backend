@@ -17,6 +17,10 @@ class CustomRequests {
         val defense: MutableList<CustomCharacter?>
     )
 
+    data class UpdateDiamondsRequest(
+        val diamonds: Int
+    )
+
     data class GetModePlayedAndOutcome(
         val caseGame: Int
     )
