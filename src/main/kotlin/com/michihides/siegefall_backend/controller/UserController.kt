@@ -246,6 +246,26 @@ class UserController(
         return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Diamonds have been updated!"))
     }
 
+    @PutMapping("/update-diamonds-subtract")
+    fun updateDiamondsSubtract(
+        @RequestParam("id") id: Long,
+        @RequestBody request: CustomRequests.UpdateDiamondsRequest
+    ): ResponseEntity<CustomAuthResponse.GeneralUpdateResponse> {
+        val foundUserOptional = customUserRepository.findById(id)
+
+        if (foundUserOptional.isEmpty) {
+            return ResponseEntity.status(404).body(CustomAuthResponse.GeneralUpdateResponse(false, "User not found"))
+        }
+
+        val foundUser = foundUserOptional.get()
+
+        val updatedUser: CustomUser = foundUser.copy(diamonds = foundUser.diamonds - request.diamonds)
+
+        customUserRepository.save(updatedUser)
+
+        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Diamonds have been updated!"))
+    }
+
     @PutMapping("/update-stamina")
     fun updateStamina(
         @RequestParam("id") id: Long,
@@ -263,9 +283,48 @@ class UserController(
 
         customUserRepository.save(updatedUser)
 
-        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Diamonds have been updated!"))
+        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Stamina have been updated!"))
     }
 
+    @PutMapping("/update-gold")
+    fun updateGold(
+        @RequestParam("id") id: Long,
+        @RequestBody request: CustomRequests.UpdateGoldRequest
+    ): ResponseEntity<CustomAuthResponse.GeneralUpdateResponse> {
+        val foundUserOptional = customUserRepository.findById(id)
+
+        if (foundUserOptional.isEmpty) {
+            return ResponseEntity.status(404).body(CustomAuthResponse.GeneralUpdateResponse(false, "User not found"))
+        }
+
+        val foundUser = foundUserOptional.get()
+
+        val updatedUser: CustomUser = foundUser.copy(gold = foundUser.gold + request.gold)
+
+        customUserRepository.save(updatedUser)
+
+        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Gold have been updated!"))
+    }
+
+    @PutMapping("/update-gold-subtract")
+    fun updateGoldSubtract(
+        @RequestParam("id") id: Long,
+        @RequestBody request: CustomRequests.UpdateGoldRequest
+    ): ResponseEntity<CustomAuthResponse.GeneralUpdateResponse> {
+        val foundUserOptional = customUserRepository.findById(id)
+
+        if (foundUserOptional.isEmpty) {
+            return ResponseEntity.status(404).body(CustomAuthResponse.GeneralUpdateResponse(false, "User not found"))
+        }
+
+        val foundUser = foundUserOptional.get()
+
+        val updatedUser: CustomUser = foundUser.copy(gold = foundUser.gold - request.gold)
+
+        customUserRepository.save(updatedUser)
+
+        return ResponseEntity.ok(CustomAuthResponse.GeneralUpdateResponse(success = true, message = "Gold have been updated!"))
+    }
 
     @Scheduled(fixedRate = 360_000)
     fun staminaRefill() {
