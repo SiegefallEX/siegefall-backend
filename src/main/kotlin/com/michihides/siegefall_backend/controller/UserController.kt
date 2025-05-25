@@ -331,8 +331,10 @@ class UserController(
         val users = customUserRepository.findAll()
 
         users.forEach { user ->
-            val updatedUser = user.copy(stamina = minOf(user.stamina + 1, 240))
-            customUserRepository.save(updatedUser)
+            if (user.stamina <= 240) {
+                val updatedUser = user.copy(stamina = minOf(user.stamina + 1, 240))
+                customUserRepository.save(updatedUser)
+            }
         }
 
         println("Stamina has been increased by 1 for all users!")
