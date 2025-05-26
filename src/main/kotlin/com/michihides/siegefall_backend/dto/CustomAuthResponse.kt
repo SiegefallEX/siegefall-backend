@@ -20,4 +20,10 @@ class CustomAuthResponse {
         val user: CustomUser,
         val message: String
     )
+
+    data class AllPlayerResponse(
+        val success: Boolean,
+        val user: List<CustomUser>,
+        val message: String
+    )
 }

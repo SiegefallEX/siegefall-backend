@@ -36,4 +36,8 @@ class CustomRequests {
     data class GetRandomPlayer(
         val user: CustomUser
     )
+
+    data class GetAllPlayers(
+        val user: List<CustomUser>
+    )
 }

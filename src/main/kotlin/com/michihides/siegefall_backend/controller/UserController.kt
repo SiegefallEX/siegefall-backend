@@ -29,11 +29,10 @@ class UserController(
 ) {
 
     @GetMapping
-    fun getAllUsers(): ResponseEntity<List<CustomUser>> {
-
+    fun getAllUsers(): ResponseEntity<CustomAuthResponse.AllPlayerResponse> {
         val result: List<CustomUser> = customUserRepository.findAll()
 
-        return ResponseEntity.ok(result)
+        return ResponseEntity.ok(CustomAuthResponse.AllPlayerResponse(success = true, user = result, message = "Users Fetched!"))
     }
 
     @GetMapping("/{username}")
